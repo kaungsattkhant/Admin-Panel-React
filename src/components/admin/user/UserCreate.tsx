@@ -7,17 +7,29 @@ import Select from '@/components/form/Select';
 import Button from '@/components/ui/button/Button';
 import { ChevronDownIcon, EyeCloseIcon, EyeIcon, TimeIcon } from '../../../icons';
 import DatePicker from '@/components/form/date-picker';
+import User from '@/app/(admin)/users/page';
+import UserPermissionList from '../permission/UserPermissionList';
 
-export default function UserCreate() {
-  const [showPassword, setShowPassword] = useState(false);
+interface Permission {
+  id: number;
+  name: string;
+}
+
+interface Props {
+  permissions: Permissions [],
+}
+export default function UserCreate({permissions}:Props) {
+console.log('User Permissions', permissions);
+ const [showPassword, setShowPassword] = useState(false);
   const options = [
-    { value: "marketing", label: "Marketing" },
-    { value: "template", label: "Template" },
-    { value: "development", label: "Development" },
+    { value: "super-admin", label: "Super Admin" },
+    { value: "admin", label: "Admin" },
+    { value: "staff", label: "Staff" },
   ];
   const handleSelectChange = (value: string) => {
     console.log("Selected value:", value);
   };
+
   const onSubmit = (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     alert("Form submitted");
@@ -37,7 +49,7 @@ export default function UserCreate() {
           <Label>Ph No:</Label>
           <Input type="text" placeholder="09123456789" />
         </div>
-        {/* <div>
+        <div>
           <Label>Select Input</Label>
           <div className="relative">
             <Select
@@ -50,7 +62,7 @@ export default function UserCreate() {
               <ChevronDownIcon/>
             </span>
           </div>
-        </div> */}
+        </div>
         <div>
           <Label>Password Input</Label>
           <div className="relative">
@@ -70,8 +82,28 @@ export default function UserCreate() {
             </button>
           </div>
         </div>
-
-        <div>
+ <div>
+          <Label>Password Confirmation</Label>
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password confirmation"
+            />
+            <button
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+            >
+              {showPassword ? (
+                <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
+              ) : (
+                <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
+              )}
+            </button>
+          </div>
+        </div>
+        <UserPermissionList permissions={permissions}/>
+        
+        {/* <div>
           <DatePicker
             id="date-picker"
             label="DOB"
@@ -81,7 +113,7 @@ export default function UserCreate() {
               console.log({ dates, currentDateString });
             }}
           />
-        </div>
+        </div> */}
 
         <Button size='md' variant="primary" onClick={(e)=>onSubmit(e)}>Save</Button>
         {/* <div>

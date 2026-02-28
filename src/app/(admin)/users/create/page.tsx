@@ -1,19 +1,33 @@
-import React from "react";
+"use client"; 
+import React ,{ useEffect,useState } from "react";
+import { apiFetch } from "@/lib/api";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { Metadata } from "next";
+// import { Metadata } from "next";
 import UserCreate from "@/components/admin/user/UserCreate";
-export const metadata: Metadata = {
-  title: "Next.js Form Elements | TailAdmin - Next.js Dashboard Template",
-  description:
-    "This is Next.js Form Elements page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
-};
+// export const metadata: Metadata = {
+//   title: "User Create",
+// };
 
-export default function create() {
+export default  function Create() {
+      const [permissions, setPermissions] = useState([]);
+      useEffect(()=>{
+        async function fetchPermissions(){
+try{
+          const res= await apiFetch("/permissions");
+          setPermissions(res.data);
+        }catch(error){
+          console.log(error);
+        }
+        }
+        fetchPermissions();
+        
+      },[])
+    // console.log('Permissions', permissions);
   return (
     <div>
       <PageBreadcrumb pageTitle="User " />
         <div className="space-y-6">
-          <UserCreate />
+          <UserCreate permissions={permissions}/>
         </div>
     </div>
   );

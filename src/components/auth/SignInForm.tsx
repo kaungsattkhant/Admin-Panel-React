@@ -28,13 +28,13 @@ export default function SignInForm() {
     // const data = await res.json();
     const data= res;
 
-    localStorage.setItem("auth", JSON.stringify(data));
+    // localStorage.setItem("auth", JSON.stringify(data));
 
     // redirect to dashboard
     router.push("/users");
-  } catch (error) {
-    console.error(error);
-    alert("Something went wrong");
+  } catch (error : any) {
+     console.error("Login error:", error);
+  alert(error.message || "Login failed");
   } finally {
     setLoading(false);
   }

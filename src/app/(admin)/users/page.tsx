@@ -37,7 +37,7 @@ import Image from "next/image";
 export default  function User() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  
    useEffect(() => {
     async function fetchUsers() {
       try {
@@ -58,7 +58,7 @@ export default  function User() {
       <div className="space-y-6">
         <ComponentCard title="User List"
         headerRight={
-         <Link href="/user/create">
+         <Link href="/users/create">
       <Button size="sm" variant="primary">
         + Create User
       </Button>
