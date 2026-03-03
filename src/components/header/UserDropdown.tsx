@@ -12,6 +12,8 @@ export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 const [user, setUser] = useState<User | null>(null);
+  const [mounted, setMounted] = useState(false);
+
 
   useEffect(() => {
     const authData = localStorage.getItem("auth");
@@ -19,14 +21,17 @@ const [user, setUser] = useState<User | null>(null);
       const parsedAuthData = JSON.parse(authData);
       setUser(parsedAuthData.data);
     }
+        setMounted(true);
+
   }, []);
+    if (!mounted) return null; // prevents hydration mismatch
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
       console.error("Logout failed:", error);
     }
-        localStorage.removeItem("token");
+        localStorage.removeItem("auth");
         router.push('/signin')
   }
 

@@ -17,21 +17,15 @@ interface PermissionGroup {
 
 interface Props {
   permissions: Permissions [],
+  selectedPermissions: number[];
+  handleToggle: (id: number) => void;
 }
-export default function UserPermissionList({permissions}:Props){
+export default function UserPermissionList({permissions,selectedPermissions,handleToggle}:Props){
      const [isChecked, setIsChecked] = useState(false);
       const [isCheckedTwo, setIsCheckedTwo] = useState(true);
       const [isCheckedDisabled, setIsCheckedDisabled] = useState(false);
-      console.log('User Permission is ',permissions);
-       const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
-
-  const handleToggle = (id: number) => {
-    setSelectedPermissions((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id]
-    );
-  };
+      // console.log('User Permission is ',permissions);
+      
     // return (
     //     <div className=" items-center gap-4">
       

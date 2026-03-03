@@ -1,66 +1,113 @@
 "use client";
 import React, { useState } from 'react';
+import dynamic from "next/dynamic";
 import ComponentCard from '../../common/ComponentCard';
 import Input from '@/components/form/input/InputField';
 import Label from '@/components/form/Label';
-import Select from '@/components/form/Select';
 import Button from '@/components/ui/button/Button';
 import { ChevronDownIcon, EyeCloseIcon, EyeIcon, TimeIcon } from '../../../icons';
-import DatePicker from '@/components/form/date-picker';
 import User from '@/app/(admin)/users/page';
 import UserPermissionList from '../permission/UserPermissionList';
+import { createUser } from '@/services/user.service';
+import  { useRouter} from "next/navigation";
+import {toast} from "react-hot-toast";
 
-interface Permission {
-  id: number;
-  name: string;
-}
+
+const Select = dynamic(() => import("react-select"), {
+  ssr: false,
+});
+
 
 interface Props {
   permissions: Permissions [],
 }
 export default function UserCreate({permissions}:Props) {
-console.log('User Permissions', permissions);
+  const router= useRouter();
+  const [loading,setLoading]=useState(false);
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    phone_number: "",
+    password: "",
+    type:"",
+    password_confirmation: "",
+    selectedPermissions: [] as number[],
+  });
+ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  console.log(e.target.value);
+    const { name, value } = e.target;
+    console.log(name, value);
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleSelectChange = (selected: any) => {
+  setForm((prev) => ({
+    ...prev,
+    type: selected ? selected.value : "",
+  }));
+};
+  const handleTogglePermission = (id: number) => {
+    console.log('Selected Id is ',id);
+  setForm((prev) => ({
+    ...prev,
+    selectedPermissions: prev.selectedPermissions.includes(id)
+      ? prev.selectedPermissions.filter((pid) => pid !== id)
+      : [...prev.selectedPermissions, id],
+  }));
+};
+
  const [showPassword, setShowPassword] = useState(false);
   const options = [
-    { value: "super-admin", label: "Super Admin" },
+    { value: "super_admin", label: "Super Admin" },
     { value: "admin", label: "Admin" },
     { value: "staff", label: "Staff" },
   ];
-  const handleSelectChange = (value: string) => {
-    console.log("Selected value:", value);
-  };
 
-  const onSubmit = (e : React.FormEvent<HTMLFormElement>) => {
+  const  onSubmit = async (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert("Form submitted");
+        console.log("Full Form State:", form);
+        try {
+    setLoading(true);
+    await createUser(form);
+    toast.success("User created successfully!");
+     router.push("/users");
+  } catch (error : any) {
+    console.error(error);
+    toast.error(error.message);
+  } finally {
+    setLoading(false);
+  }
   };
   return (
     <ComponentCard title="User Create">
+      <form onSubmit={onSubmit}>
+
       <div className="space-y-6">
         <div>
           <Label>Name</Label>
-          <Input type="text" />
+          <Input type="text" name="username" value={form.username} onChange={handleChange} required/>
         </div>
         <div>
           <Label>Email:</Label>
-          <Input type="text" placeholder="example@gmail.com" />
+          <Input type="text" placeholder="example@gmail.com" name="email" value={form.email} onChange={handleChange} required/>
         </div>
           <div>
           <Label>Ph No:</Label>
-          <Input type="text" placeholder="09123456789" />
+          <Input type="text" placeholder="09123456789" name="phone_number" value={form.phone_number} onChange={handleChange} required/>
         </div>
         <div>
-          <Label>Select Input</Label>
+          <Label>Type</Label>
           <div className="relative">
-            <Select
-            options={options}
-            placeholder="Select an option"
-            onChange={handleSelectChange}
-            className="dark:bg-dark-900"
-          />
-             <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-              <ChevronDownIcon/>
-            </span>
+           <Select
+        options={options}
+        placeholder="Search and select..."
+        onChange={handleSelectChange}
+        value={options.find((opt) => opt.value === form.type)}
+        isSearchable
+        className="text-sm"
+        name="type"
+        required
+      />
           </div>
         </div>
         <div>
@@ -69,6 +116,10 @@ console.log('User Permissions', permissions);
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
+              name="password"
+              value={form.password} 
+              onChange={handleChange} 
+              required
             />
             <button
               onClick={() => setShowPassword(!showPassword)}
@@ -88,6 +139,10 @@ console.log('User Permissions', permissions);
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password confirmation"
+              name="password_confirmation"
+              value={form.password_confirmation}
+              onChange={handleChange}
+              required  
             />
             <button
               onClick={() => setShowPassword(!showPassword)}
@@ -101,7 +156,7 @@ console.log('User Permissions', permissions);
             </button>
           </div>
         </div>
-        <UserPermissionList permissions={permissions}/>
+        <UserPermissionList permissions={permissions} selectedPermissions={form.selectedPermissions} handleToggle={handleTogglePermission}/>
         
         {/* <div>
           <DatePicker
@@ -115,8 +170,9 @@ console.log('User Permissions', permissions);
           />
         </div> */}
 
-        <Button size='md' variant="primary" onClick={(e)=>onSubmit(e)}>Save</Button>
-        {/* <div>
+<Button type="submit" size="md" variant="primary" disabled={loading}>
+        {loading ? "Saving..." : "Save"}
+      </Button>        {/* <div>
           <Label htmlFor="tm">Time Picker Input</Label>
           <div className="relative">
             <Input
@@ -157,6 +213,7 @@ console.log('User Permissions', permissions);
           </div>
         </div> */}
       </div>
+      </form>
     </ComponentCard>
   );
 }

@@ -66,3 +66,11 @@ export async function logout() {
     method: "POST",
   });
 }
+
+//user create
+// export function createUser(data: any) {
+//   return apiFetch("/users", {
+//     method: "POST",
+//     body: JSON.stringify(data),
+//   });
+// }
